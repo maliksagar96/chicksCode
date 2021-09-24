@@ -1,13 +1,29 @@
-int ledPin =  13;
+//Put desired values of off time and on time.
+int ledOnTime = 6;
+int ledOffTime = 3;
+
+int startHour = 12;
+int endHour = 36;
+
+int ledPin1 =  13;
+int ledPin2 = 12;
+int ledPin3 = 11;
+int ledPin4 = 10;
+int ledPin5 = 9;
+int ledPin6 = 8;
+int ledPin7 = 5;
+int ledPin8 = 6;
+
 int count16bit = 0;
 int count8bit = 0;
 int hourCounter = 0;
 int secondCounter = 0;
 int secCounter = 0;
 
+//Condition flags  
 bool ledOn = 0;
 bool ledOff = 1;
-bool twelvehrFlag = 0;      //Twelve hour Flag
+bool twelvehrFlag = 0;              //Set to 1 if want to start the process imediately.     
 bool state = 0;
 bool timeEnd = 0;
 
@@ -34,14 +50,14 @@ ISR(TIMER2_OVF_vect){
    count8bit = 0;
   }
   
-  if((secCounter == 1) && (ledOff)) {
+  if((secCounter == ledOffTime) && (ledOff)) {
     state = 1;
     ledOn = 1;
     ledOff = 0;
     secCounter = 0;
   }
   
-  if((secCounter == 1) && (ledOn)) {
+  if((secCounter == ledOnTime) && (ledOn)) {
     state = 0;
     ledOn = 0;
     ledOff = 1;
@@ -52,16 +68,16 @@ ISR(TIMER2_OVF_vect){
 // timer compare interrupt service routine for timer 1
 ISR(TIMER1_COMPA_vect) {
   secondCounter++;
-  if(secondCounter >= 5) {
+  if(secondCounter >= 3600) {
     secondCounter = 0;
     hourCounter++;
   }
   
-  if(hourCounter == 2) {
+  if(hourCounter == startHour) {
       twelvehrFlag = 1;
   }
   
-  if(hourCounter == 8) {
+  if(hourCounter == endHour) {
     timeEnd = 1;
     state = 0;
     blinkLED();
@@ -70,12 +86,27 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void blinkLED() {  
-  digitalWrite(ledPin, state);
+  digitalWrite(ledPin1, state);
+  digitalWrite(ledPin2, state);
+  digitalWrite(ledPin3, state);
+  digitalWrite(ledPin4, state);
+  digitalWrite(ledPin5, state);
+  digitalWrite(ledPin6, state);
+  digitalWrite(ledPin7, state);
+  digitalWrite(ledPin8, state);
 }
 
 void setup() {
   Serial.begin(9600);
-  pinMode(ledPin, OUTPUT);  
+  pinMode(ledPin1, OUTPUT);  
+  pinMode(ledPin2, OUTPUT);  
+  pinMode(ledPin3, OUTPUT);  
+  pinMode(ledPin4, OUTPUT);  
+  pinMode(ledPin5, OUTPUT);  
+  pinMode(ledPin6, OUTPUT);  
+  pinMode(ledPin7, OUTPUT);  
+  pinMode(ledPin8, OUTPUT);  
+  
   noInterrupts();
  
   init16bit();    // initialize timer1
@@ -84,7 +115,7 @@ void setup() {
 }
 
 void loop() {
- 
+  
  if(twelvehrFlag) {
   if(timeEnd == 0) {
     blinkLED();
